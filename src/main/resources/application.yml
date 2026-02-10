@@ -16,3 +16,7 @@ spring:
 telx:
   call:
     rate-per-minute: 0.05
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
