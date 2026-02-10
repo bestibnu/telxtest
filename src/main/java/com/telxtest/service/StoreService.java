@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,20 +24,22 @@ public class StoreService {
     private static final long CREDIT_BALANCE_ID = 1L;
     private static final BigDecimal DEFAULT_BALANCE = new BigDecimal("10.00");
     private static final String DEFAULT_CURRENCY = "USD";
-    private static final BigDecimal RATE_PER_MINUTE = new BigDecimal("0.05");
 
     private final ContactRepository contactRepository;
     private final CallRecordRepository callRecordRepository;
     private final CreditBalanceRepository creditBalanceRepository;
+    private final BigDecimal ratePerMinute;
 
     public StoreService(
             ContactRepository contactRepository,
             CallRecordRepository callRecordRepository,
-            CreditBalanceRepository creditBalanceRepository
+            CreditBalanceRepository creditBalanceRepository,
+            @Value("${telx.call.rate-per-minute:0.05}") BigDecimal ratePerMinute
     ) {
         this.contactRepository = contactRepository;
         this.callRecordRepository = callRecordRepository;
         this.creditBalanceRepository = creditBalanceRepository;
+        this.ratePerMinute = ratePerMinute;
     }
 
     @Transactional(readOnly = true)
@@ -174,7 +177,7 @@ public class StoreService {
             return BigDecimal.ZERO;
         }
         long minutes = (durationSec + 59L) / 60L;
-        return RATE_PER_MINUTE.multiply(BigDecimal.valueOf(minutes));
+        return ratePerMinute.multiply(BigDecimal.valueOf(minutes));
     }
 
     private void applyCharge(BigDecimal amount) {
