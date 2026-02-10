@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TelxTest</string>
+    <string name="web_app_url">http://10.0.2.2:5173/</string>
+    <string name="web_services_fragment">services</string>
+    <string name="web_account_fragment">account</string>
+</resources>

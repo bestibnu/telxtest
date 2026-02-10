@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: telxtest-backend
+  datasource:
+    url: ${TELX_DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${TELX_DB_USER:postgres}
+    password: ${TELX_DB_PASSWORD:root}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false

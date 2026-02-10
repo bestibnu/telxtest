@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="telx_orange">#E4572E</color>
+    <color name="telx_orange_dark">#BF3410</color>
+    <color name="telx_ink">#1F1B16</color>
+    <color name="telx_muted">#6C5F52</color>
+    <color name="telx_surface">#FFFAF3</color>
+    <color name="telx_page">#F3EFE7</color>
+</resources>

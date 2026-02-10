@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.TelxTest" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/telx_orange</item>
+        <item name="colorPrimaryVariant">@color/telx_orange_dark</item>
+        <item name="colorSecondary">@color/telx_ink</item>
+        <item name="colorSurface">@color/telx_surface</item>
+        <item name="android:colorBackground">@color/telx_page</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
+</resources>
