@@ -1,5 +1,6 @@
 package com.telxtest.service;
 
+import com.telxtest.model.CallEventRequest;
 import com.telxtest.model.CallRecord;
 import com.telxtest.model.Contact;
 import com.telxtest.model.CreditBalance;
@@ -22,6 +23,7 @@ public class StoreService {
     private static final long CREDIT_BALANCE_ID = 1L;
     private static final BigDecimal DEFAULT_BALANCE = new BigDecimal("10.00");
     private static final String DEFAULT_CURRENCY = "USD";
+    private static final BigDecimal RATE_PER_MINUTE = new BigDecimal("0.05");
 
     private final ContactRepository contactRepository;
     private final CallRecordRepository callRecordRepository;
@@ -70,12 +72,46 @@ public class StoreService {
     }
 
     @Transactional
-    public CallRecord recordCall(String from, String to, String status) {
+    public CallRecord startCall(String from, String to) {
         CallRecordEntity entity = new CallRecordEntity();
         entity.setFromNumber(from);
         entity.setToNumber(to);
         entity.setStartedAt(Instant.now());
-        entity.setStatus(status);
+        entity.setStatus("initiated");
+        entity.setProvider("app");
+        return toCallRecord(callRecordRepository.save(entity));
+    }
+
+    @Transactional
+    public CallRecord recordCallEvent(CallEventRequest event) {
+        CallRecordEntity entity = callRecordRepository.findByCallSid(event.callSid())
+                .orElseGet(CallRecordEntity::new);
+        Instant eventTime = event.timestamp() != null ? event.timestamp() : Instant.now();
+
+        if (entity.getStartedAt() == null) {
+            entity.setStartedAt(eventTime);
+        }
+        entity.setFromNumber(event.from());
+        entity.setToNumber(event.to());
+        entity.setProvider(event.provider());
+        entity.setCallSid(event.callSid());
+        entity.setStatus(event.status());
+
+        if (event.durationSec() != null) {
+            entity.setDurationSec(event.durationSec());
+        }
+
+        if ("completed".equalsIgnoreCase(event.status())) {
+            if (entity.getEndedAt() == null) {
+                entity.setEndedAt(eventTime);
+            }
+            if (entity.getCost() == null) {
+                BigDecimal cost = calculateCost(entity.getDurationSec());
+                entity.setCost(cost);
+                applyCharge(cost);
+            }
+        }
+
         return toCallRecord(callRecordRepository.save(entity));
     }
 
@@ -104,7 +140,12 @@ public class StoreService {
                 entity.getFromNumber(),
                 entity.getToNumber(),
                 entity.getStartedAt(),
-                entity.getStatus()
+                entity.getStatus(),
+                entity.getProvider(),
+                entity.getCallSid(),
+                entity.getDurationSec(),
+                entity.getEndedAt(),
+                entity.getCost()
         );
     }
 
@@ -126,5 +167,23 @@ public class StoreService {
         entity.setBalance(DEFAULT_BALANCE);
         entity.setCurrency(DEFAULT_CURRENCY);
         return creditBalanceRepository.save(entity);
+    }
+
+    private BigDecimal calculateCost(Integer durationSec) {
+        if (durationSec == null || durationSec <= 0) {
+            return BigDecimal.ZERO;
+        }
+        long minutes = (durationSec + 59L) / 60L;
+        return RATE_PER_MINUTE.multiply(BigDecimal.valueOf(minutes));
+    }
+
+    private void applyCharge(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0) {
+            return;
+        }
+        CreditBalanceEntity entity = creditBalanceRepository.findById(CREDIT_BALANCE_ID)
+                .orElseGet(this::createDefaultBalance);
+        entity.setBalance(entity.getBalance().subtract(amount));
+        creditBalanceRepository.save(entity);
     }
 }

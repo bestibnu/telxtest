@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -23,6 +24,13 @@ public class CallRecordEntity {
 
     private Instant startedAt;
     private String status;
+    private String provider;
+    private String callSid;
+    private Integer durationSec;
+    private Instant endedAt;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal cost;
 
     public CallRecordEntity() {
     }
@@ -65,5 +73,45 @@ public class CallRecordEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public String getCallSid() {
+        return callSid;
+    }
+
+    public void setCallSid(String callSid) {
+        this.callSid = callSid;
+    }
+
+    public Integer getDurationSec() {
+        return durationSec;
+    }
+
+    public void setDurationSec(Integer durationSec) {
+        this.durationSec = durationSec;
+    }
+
+    public Instant getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(Instant endedAt) {
+        this.endedAt = endedAt;
+    }
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
 }

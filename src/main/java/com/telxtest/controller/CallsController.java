@@ -1,5 +1,6 @@
 package com.telxtest.controller;
 
+import com.telxtest.model.CallEventRequest;
 import com.telxtest.model.CallRecord;
 import com.telxtest.model.CallRequest;
 import com.telxtest.service.StoreService;
@@ -27,6 +28,11 @@ public class CallsController {
 
     @PostMapping
     public CallRecord placeCall(@Valid @RequestBody CallRequest request) {
-        return store.recordCall(request.from(), request.to(), "queued");
+        return store.startCall(request.from(), request.to());
+    }
+
+    @PostMapping("/events")
+    public CallRecord recordEvent(@Valid @RequestBody CallEventRequest request) {
+        return store.recordCallEvent(request);
     }
 }
